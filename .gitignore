@@ -34,3 +34,12 @@ Thumbs.db
 
 # ---- Logs ----
 *.log
+
+# ---- Generated output (Day 4+) ----
+output/
+*.png
+!docs/*.png
+
+# ---- Local-only test files ----
+local/
+scratch.*

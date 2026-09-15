@@ -1,0 +1,12 @@
+# Insecure topology — direct internet->internal and web->database links.
+
+# Devices
+device internet internet external
+device web1     web_server dmz
+device db1      database internal
+device app1     app_server internal
+
+# Connections
+internet -- web1
+web1     -- db1
+internet -- app1

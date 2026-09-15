@@ -1,0 +1,16 @@
+# Secure topology — layered defense with two firewalls.
+
+# Devices: <id> <type> <zone>
+device internet internet external
+device fw1      firewall dmz
+device web1     web_server dmz
+device fw2      firewall internal
+device app1     app_server internal
+device db1      database internal
+
+# Connections: <from> -- <to>
+internet -- fw1
+fw1      -- web1
+web1     -- fw2
+fw2      -- app1
+app1     -- db1
