@@ -1,0 +1,38 @@
+{
+  "devices": [
+    {
+      "id": "internet",
+      "type": "internet",
+      "zone": "external"
+    },
+    {
+      "id": "web1",
+      "type": "web_server",
+      "zone": "dmz"
+    },
+    {
+      "id": "db1",
+      "type": "database",
+      "zone": "internal"
+    },
+    {
+      "id": "app1",
+      "type": "app_server",
+      "zone": "internal"
+    }
+  ],
+  "connections": [
+    {
+      "from": "internet",
+      "to": "web1"
+    },
+    {
+      "from": "web1",
+      "to": "db1"
+    },
+    {
+      "from": "internet",
+      "to": "app1"
+    }
+  ]
+}
