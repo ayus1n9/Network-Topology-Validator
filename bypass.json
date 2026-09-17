@@ -1,0 +1,13 @@
+{
+  "devices": [
+    {"id": "internet", "type": "internet", "zone": "external"},
+    {"id": "edge_router", "type": "router", "zone": "external"},
+    {"id": "internal_switch", "type": "switch", "zone": "internal"},
+    {"id": "db1", "type": "database", "zone": "internal"}
+  ],
+  "connections": [
+    {"from": "internet", "to": "edge_router"},
+    {"from": "edge_router", "to": "internal_switch"},
+    {"from": "internal_switch", "to": "db1"}
+  ]
+}

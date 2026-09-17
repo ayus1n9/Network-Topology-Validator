@@ -1,5 +1,4 @@
-"""Security rules for network topology validation."""
-
+from topology_validator.graph import reachable_from, is_reachable, shortest_path
 from topology_validator.constants import (
     EXTERNAL_ZONES,
     TRUSTED_ZONES,
@@ -190,24 +189,116 @@ def rule_web_to_database(devices_dict, graph):
 
     return findings
 
-
-def validate_security_rules(devices_dict, graph):
+def rule_no_firewall_path(devices_dict, graph):
     """
-    Run every security rule against the topology and return deduplicated,
-    severity-sorted findings.
+    Flag any path from an internet-facing device to a database that
+    never passes through a firewall.
+
+    This catches "silent bypasses" — cases where the internet can reach
+    the DB through non-firewall hops, even if there's no direct edge.
 
     Args:
         devices_dict (dict): Mapping of device_id -> device_dict.
         graph (dict): Adjacency list mapping device_id -> set of neighbors.
 
     Returns:
-        list: Sorted, deduplicated list of finding dicts.
+        list: List of finding dicts.
+    """
+    firewalls = {
+        dev_id for dev_id, dev in devices_dict.items()
+        if dev["type"] == "firewall"
+    }
+    internet_devices = {
+        dev_id for dev_id, dev in devices_dict.items()
+        if dev["type"] == "internet" or dev["zone"] in EXTERNAL_ZONES
+    }
+    db_devices = {
+        dev_id for dev_id, dev in devices_dict.items()
+        if dev["type"] == "database"
+    }
+
+    findings = []
+
+    for src in internet_devices:
+        # BFS from this internet device, refusing to pass through any firewall.
+        reachable = reachable_from(graph, src, blocked=frozenset(firewalls))
+
+        for db in db_devices:
+            if db in reachable:
+                findings.append({
+                    "severity": "critical",
+                    "message": (
+                        f"Internet-facing device '{src}' can reach database "
+                        f"'{db}' without passing through any firewall."
+                    ),
+                    "devices": [src, db],
+                })
+
+    return findings
+
+
+def rule_single_point_of_failure(devices_dict, graph):
+    """
+    Flag devices whose failure disconnects an internet-facing device
+    from a database.
+
+    Every path from internet to DB passes through these nodes — meaning
+    a single hardware failure or compromise takes the whole chain down.
+
+    Args:
+        devices_dict (dict): Mapping of device_id -> device_dict.
+        graph (dict): Adjacency list mapping device_id -> set of neighbors.
+
+    Returns:
+        list: List of finding dicts.
+    """
+    internet_devices = {
+        dev_id for dev_id, dev in devices_dict.items()
+        if dev["type"] == "internet" or dev["zone"] in EXTERNAL_ZONES
+    }
+    db_devices = {
+        dev_id for dev_id, dev in devices_dict.items()
+        if dev["type"] == "database"
+    }
+
+    findings = []
+
+    for src in internet_devices:
+        for db in db_devices:
+            path = shortest_path(graph, src, db)
+            if not path:
+                continue  # No path at all — different problem (not our concern here)
+
+            spofs = []
+            for node in path[1:-1]:  # exclude src and db themselves
+                if not is_reachable(graph, src, db, blocked=frozenset({node})):
+                    spofs.append(node)
+
+            if spofs:
+                findings.append({
+                    "severity": "medium",
+                    "message": (
+                        f"Critical path from '{src}' to '{db}' has no redundancy — "
+                        f"these devices are single points of failure: "
+                        f"{', '.join(spofs)}."
+                    ),
+                    "devices": [src, db] + spofs,
+                })
+
+    return findings
+
+def validate_security_rules(devices_dict, graph):
+    """
+    Run every security rule against the topology and return deduplicated,
+    severity-sorted findings.
     """
     all_findings = []
     all_findings.extend(rule_database_exposed(devices_dict, graph))
     all_findings.extend(rule_internet_to_internal(devices_dict, graph))
     all_findings.extend(rule_dmz_to_internal(devices_dict, graph))
     all_findings.extend(rule_web_to_database(devices_dict, graph))
+    all_findings.extend(rule_no_firewall_path(devices_dict, graph))
+    all_findings.extend(rule_single_point_of_failure(devices_dict, graph))
 
     seen = set()
     unique_findings = []
