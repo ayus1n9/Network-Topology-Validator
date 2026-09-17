@@ -3,6 +3,7 @@
 import argparse
 import sys
 
+from topology_validator.visualize import visualize_topology
 from topology_validator.loader import load_topology
 from topology_validator.parser import parse_devices, parse_connections
 from topology_validator.graph import build_graph
@@ -24,12 +25,17 @@ def main():
     )
     parser.add_argument(
         "topology_file",
-        help="Path to the JSON topology file (e.g. secure.json).",
+        help="Path to the topology file (.json or .txt).",
     )
     parser.add_argument(
         "-q", "--quiet",
         action="store_true",
         help="Suppress the report; only set the exit code.",
+    )
+    parser.add_argument(
+        "-v", "--visualize",
+        action="store_true",
+        help="Render the topology to a PNG file (e.g. insecure.png).",
     )
     args = parser.parse_args()
 
@@ -46,6 +52,17 @@ def main():
 
     if not args.quiet:
         generate_report(findings)
+
+    if args.visualize:
+        # Strip .json / .txt from the input, add .png
+        base = args.topology_file.rsplit(".", 1)[0]
+        output_path = f"{base}.png"
+        try:
+            visualize_topology(devices, graph, findings, output_path)
+            print(f"\nVisualization written to: {output_path}")
+        except Exception as e:
+            print(f"Error generating visualization: {e}", file=sys.stderr)
+            sys.exit(2)
 
     sys.exit(1 if findings else 0)
 
