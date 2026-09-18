@@ -14,13 +14,16 @@ build/
 dist/
 *.egg-info/
 *.egg
+.eggs/
 
 # ---- Test & lint caches ----
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 .mypy_cache/
 .ruff_cache/
+.tox/
 
 # ---- IDE / editor ----
 .vscode/
@@ -35,7 +38,7 @@ Thumbs.db
 # ---- Logs ----
 *.log
 
-# ---- Generated output (Day 4+) ----
+# ---- Generated output ----
 output/
 *.png
 !docs/*.png
