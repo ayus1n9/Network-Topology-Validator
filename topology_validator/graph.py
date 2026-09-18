@@ -2,7 +2,6 @@
 
 from collections import deque
 
-
 def build_graph(devices_dict, connections):
     """
     Build an undirected adjacency list from devices and connections.
@@ -39,6 +38,8 @@ def reachable_from(graph, source, blocked=frozenset()):
     """
     if source in blocked:
         return set()
+    if source not in graph:
+        return set() 
 
     visited = {source}
     queue = deque([source])
