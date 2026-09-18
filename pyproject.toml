@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "topology-validator"
+version = "0.8.0"
+description = "Validate network topologies for security design flaws. PBQ-style simulator included."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Ayush Singh", email = "--" }
+]
+keywords = ["network", "security", "topology", "validator", "pbq"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+]
+dependencies = [
+    "networkx>=3.0",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+topology-validator = "topology_validator.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ayus1n9/topology-validator"
+Source   = "https://github.com/ayus1n9/topology-validator"
+
+[tool.setuptools]
+packages = ["topology_validator"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
