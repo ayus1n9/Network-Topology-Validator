@@ -13,6 +13,7 @@ Public API:
     generate_json_report    -- write a JSON report
     generate_html_report    -- write an HTML report
     visualize_topology      -- render a PNG of the topology
+    run_interactive         -- start the interactive PBQ-style REPL
 """
 
 from topology_validator.loader import load_topology
@@ -27,6 +28,7 @@ from topology_validator.report import (
     generate_html_report,
 )
 from topology_validator.visualize import visualize_topology
+from topology_validator.interactive import run_interactive
 
 __all__ = [
     "load_topology",
@@ -40,4 +42,5 @@ __all__ = [
     "generate_json_report",
     "generate_html_report",
     "visualize_topology",
+    "run_interactive",
 ]

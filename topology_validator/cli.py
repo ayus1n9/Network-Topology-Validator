@@ -14,23 +14,62 @@ from topology_validator.report import (
     generate_html_report,
 )
 from topology_validator.visualize import visualize_topology
+from topology_validator.interactive import run_interactive
 
 def main():
+    """
+    CLI entry point. Parses arguments, runs the validator, prints the report.
+
+    Exit codes:
+        0 = no findings (topology is clean)
+        1 = findings present (topology has security flaws)
+        2 = error (bad arguments, missing file, malformed data)
+    """
     parser = argparse.ArgumentParser(
         description="Validate a network topology file for security design flaws.",
     )
-    parser.add_argument("topology_file", help="Path to the topology file (.json or .txt).")
-    parser.add_argument("-q", "--quiet", action="store_true",
-                        help="Suppress the terminal report; only set the exit code.")
-    parser.add_argument("-v", "--visualize", action="store_true",
-                        help="Render the topology to a PNG file.")
-    parser.add_argument("-f", "--format", choices=("text", "json", "html"),
-                        default="text", help="Report format (default: text).")
-    parser.add_argument("-o", "--output",
-                        help="Output path for json/html reports (default derived from input).")
+    parser.add_argument(
+        "topology_file",
+        nargs="?",
+        help="Path to the topology file (.json or .txt). Optional with --interactive.",
+    )
+    parser.add_argument(
+        "-i", "--interactive",
+        action="store_true",
+        help="Launch the interactive PBQ-style topology builder.",
+    )
+    parser.add_argument(
+        "-q", "--quiet",
+        action="store_true",
+        help="Suppress the terminal report; only set the exit code.",
+    )
+    parser.add_argument(
+        "-v", "--visualize",
+        action="store_true",
+        help="Render the topology to a PNG file.",
+    )
+    parser.add_argument(
+        "-f", "--format",
+        choices=("text", "json", "html"),
+        default="text",
+        help="Report format (default: text).",
+    )
+    parser.add_argument(
+        "-o", "--output",
+        help="Output path for json/html reports (default derived from input).",
+    )
     args = parser.parse_args()
 
-    # Load + parse
+    # ---- Interactive mode short-circuits everything else ----
+    if args.interactive:
+        run_interactive(initial_file=args.topology_file)
+        sys.exit(0)
+
+    # ---- Non-interactive mode requires a topology file ----
+    if not args.topology_file:
+        parser.error("topology_file is required unless --interactive is used.")
+
+    # ---- Load + parse ----
     try:
         topo = load_topology(args.topology_file)
         devices = parse_devices(topo["devices"])
@@ -40,14 +79,14 @@ def main():
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(2)
 
-    # Validate
+    # ---- Validate ----
     findings = validate_security_rules(devices, graph)
     score = calculate_score(findings)
 
     base = args.topology_file.rsplit(".", 1)[0]
     outputs_written = []
 
-    # Optional visualization
+    # ---- Optional visualization ----
     png_path = None
     if args.visualize:
         png_path = f"{base}.png"
@@ -58,7 +97,7 @@ def main():
             print(f"Error generating visualization: {e}", file=sys.stderr)
             sys.exit(2)
 
-    # Report
+    # ---- Report ----
     if args.format == "text":
         if not args.quiet:
             generate_report(findings)
@@ -73,8 +112,10 @@ def main():
     elif args.format == "html":
         output_path = args.output or f"{base}.report.html"
         try:
-            generate_html_report(findings, score, args.topology_file, output_path,
-                                 png_path=png_path)
+            generate_html_report(
+                findings, score, args.topology_file, output_path,
+                png_path=png_path,
+            )
             outputs_written.append(output_path)
         except OSError as e:
             print(f"Error writing HTML report: {e}", file=sys.stderr)
