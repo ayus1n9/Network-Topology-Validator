@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "Ayush Singh", email = "--" }
+    { name = "Ayush Singh" }
 ]
 keywords = ["network", "security", "topology", "validator", "pbq"]
 classifiers = [
@@ -45,3 +45,7 @@ packages = ["topology_validator"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "build", "dist"]
+skips = ["B101"]  # B101 = assert_used (fine in our context)
