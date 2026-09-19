@@ -12,7 +12,7 @@ license = { text = "MIT" }
 authors = [
     { name = "Ayush Singh" }
 ]
-keywords = ["network", "security", "topology", "validator", "pbq"]
+keywords = ["network", "security", "topology", "validator", "pbq", "devsecops"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Information Technology",
@@ -30,14 +30,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0"]
+dev = ["pytest>=7.0", "bandit[toml]>=1.7", "pip-audit>=2.6"]
 
 [project.scripts]
 topology-validator = "topology_validator.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/ayus1n9/topology-validator"
-Source   = "https://github.com/ayus1n9/topology-validator"
+Source = "https://github.com/ayus1n9/topology-validator"
+Issues = "https://github.com/ayus1n9/topology-validator/issues"
+Changelog = "https://github.com/ayus1n9/topology-validator/releases"
 
 [tool.setuptools]
 packages = ["topology_validator"]

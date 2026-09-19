@@ -1,0 +1,8 @@
+services:
+  validator:
+    build: .
+    image: topology-validator:latest
+    volumes:
+      - .:/data
+    working_dir: /data
+    # Example: docker compose run --rm validator insecure.json
