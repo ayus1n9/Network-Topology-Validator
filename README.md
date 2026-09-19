@@ -1,10 +1,12 @@
 # Topology Validator
 
-> Validate network topologies for security design flaws — with an interactive PBQ-style simulator.
+[![tests](https://github.com/ayus1n9/topology-validator/actions/workflows/tests.yml/badge.svg)](https://github.com/ayus1n9/topology-validator/actions/workflows/tests.yml)
+[![security](https://github.com/ayus1n9/topology-validator/actions/workflows/security.yml/badge.svg)](https://github.com/ayus1n9/topology-validator/actions/workflows/security.yml)
+[![CodeQL](https://github.com/ayus1n9/topology-validator/actions/workflows/codeql.yml/badge.svg)](https://github.com/ayus1n9/topology-validator/actions/workflows/codeql.yml)
+[![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-![Python](https://img.shields.io/badge/python-3.9%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+> Validate network topologies for security design flaws — with an interactive PBQ-style simulator.
 
 A Python tool that reads network topologies (JSON or plain text) and flags common
 security design flaws — databases exposed to the DMZ, missing firewall layers,
