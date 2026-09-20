@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "topology-validator"
-version = "0.10.0"
+version = "1.0.0"
 description = "Validate network topologies for security design flaws. PBQ-style simulator included."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -36,10 +36,10 @@ dev = ["pytest>=7.0", "bandit[toml]>=1.7", "pip-audit>=2.6"]
 topology-validator = "topology_validator.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/ayus1n9/topology-validator"
-Source = "https://github.com/ayus1n9/topology-validator"
-Issues = "https://github.com/ayus1n9/topology-validator/issues"
-Changelog = "https://github.com/ayus1n9/topology-validator/releases"
+Homepage = "https://github.com/ayus1n9/Network-Topology-Validator"
+Source = "https://github.com/ayus1n9/Network-Topology-Validator"
+Issues = "https://github.com/ayus1n9/Network-Topology-Validator/issues"
+Changelog = "https://github.com/ayus1n9/Network-Topology-Validator/releases"
 
 [tool.setuptools]
 packages = ["topology_validator"]
