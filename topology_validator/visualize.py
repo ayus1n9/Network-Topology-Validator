@@ -1,5 +1,7 @@
 """Render a topology as a PNG image using networkx and matplotlib."""
 
+import matplotlib
+matplotlib.use("Agg")
 import networkx as nx
 import matplotlib.pyplot as plt
 
