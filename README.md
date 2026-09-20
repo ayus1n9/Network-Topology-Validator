@@ -1,8 +1,8 @@
 # Topology Validator
 
-[![tests](https://github.com/ayus1n9/topology-validator/actions/workflows/tests.yml/badge.svg)](https://github.com/ayus1n9/topology-validator/actions/workflows/tests.yml)
-[![security](https://github.com/ayus1n9/topology-validator/actions/workflows/security.yml/badge.svg)](https://github.com/ayus1n9/topology-validator/actions/workflows/security.yml)
-[![CodeQL](https://github.com/ayus1n9/topology-validator/actions/workflows/codeql.yml/badge.svg)](https://github.com/ayus1n9/topology-validator/actions/workflows/codeql.yml)
+[![tests](https://github.com/ayus1n9/Network-Topology-Validator/actions/workflows/tests.yml/badge.svg)](https://github.com/ayus1n9/Network-Topology-Validator/actions/workflows/tests.yml)
+[![security](https://github.com/ayus1n9/Network-Topology-Validator/actions/workflows/security.yml/badge.svg)](https://github.com/ayus1n9/Network-Topology-Validator/actions/workflows/security.yml)
+[![PyPI](https://img.shields.io/pypi/v/toposec)](https://pypi.org/project/toposec/)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -26,10 +26,10 @@ on demand, and watch your security score change.
 
 ## Installation
 
+### From PyPI
+
 ```bash
-git clone https://github.com/ayus1n9/topology-validator.git
-cd topology-validator
-pip install -e .
+pip install toposec
 ```
 
 This installs a `topology-validator` command on your PATH.
@@ -64,14 +64,18 @@ Output:
 {
   "devices": [
     {"id": "internet", "type": "internet", "zone": "external"},
-    {"id": "fw1",      "type": "firewall", "zone": "dmz"},
-    {"id": "web1",     "type": "web_server", "zone": "dmz"},
-    {"id": "db1",      "type": "database", "zone": "internal"}
+    {"id": "fw1", "type": "firewall", "zone": "dmz"},
+    {"id": "web1", "type": "web_server", "zone": "dmz"},
+    {"id": "fw2", "type": "firewall", "zone": "internal"},
+    {"id": "app1", "type": "app_server", "zone": "internal"},
+    {"id": "db1", "type": "database", "zone": "internal"}
   ],
   "connections": [
     {"from": "internet", "to": "fw1"},
     {"from": "fw1", "to": "web1"},
-    {"from": "web1", "to": "db1"}
+    {"from": "web1", "to": "fw2"},
+    {"from": "fw2", "to": "app1"},
+    {"from": "app1", "to": "db1"}
   ]
 }
 ```
@@ -82,11 +86,15 @@ Output:
 device internet internet external
 device fw1      firewall dmz
 device web1     web_server dmz
+device fw2      firewall internal
+device app1     app_server internal
 device db1      database internal
 
 internet -- fw1
 fw1 -- web1
-web1 -- db1
+web1 -- fw2
+fw2 -- app1
+app1 -- db1
 ```
 
 ## Rules
