@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "topology-validator"
+name = "toposec"
 version = "1.0.0"
 description = "Validate network topologies for security design flaws. PBQ-style simulator included."
 readme = "README.md"
