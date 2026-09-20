@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>toposec — topology security validator</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f6fa; color: #2c3e50; margin: 0; padding: 40px 20px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { margin: 0 0 8px 0; font-size: 28px; }
+  .subtitle { color: #7f8c8d; margin-bottom: 24px; }
+  .card {
+    background: white; border-radius: 8px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;
+  }
+  label { display: block; font-weight: 600; margin-bottom: 8px; }
+  textarea {
+    width: 100%; min-height: 220px; padding: 12px;
+    border: 1px solid #dfe6e9; border-radius: 6px;
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 13px; resize: vertical;
+  }
+  button {
+    background: #2c3e50; color: white; border: none; padding: 10px 22px;
+    border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-top: 12px;
+  }
+  button:hover { background: #1a252f; }
+  .error {
+    background: #fdecea; border-left: 4px solid #e74c3c; padding: 12px 16px;
+    border-radius: 4px; color: #922b21; margin: 16px 0;
+  }
+  .score-badge {
+    display: inline-flex; align-items: baseline; gap: 12px;
+    padding: 16px 24px; border-radius: 8px; background: #f8f9fa;
+    margin-bottom: 16px;
+  }
+  .score-num { font-size: 36px; font-weight: 700; }
+  .score-grade { font-size: 24px; font-weight: 700; }
+  .finding {
+    border-left: 4px solid #ddd; padding: 12px 16px;
+    margin-bottom: 10px; background: #fafbfc; border-radius: 4px;
+  }
+  .finding.critical { border-left-color: #8e44ad; }
+  .finding.high     { border-left-color: #e74c3c; }
+  .finding.medium   { border-left-color: #f39c12; }
+  .finding.low      { border-left-color: #3498db; }
+  .finding .sev { font-size: 11px; font-weight: 700; letter-spacing: 1px;
+                   text-transform: uppercase; color: #7f8c8d; }
+  .finding .msg { margin: 4px 0; }
+  .finding .devices { font-size: 12px; color: #7f8c8d;
+                       font-family: monospace; }
+  .topology-img { max-width: 100%; border-radius: 6px; margin-top: 12px; }
+  .footer { text-align: center; color: #95a5a6; font-size: 13px;
+             margin-top: 32px; }
+  .footer a { color: #7f8c8d; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>toposec</h1>
+  <div class="subtitle">
+    Validate a network topology for security design flaws.
+    Paste JSON or the text format, then submit.
+  </div>
+
+  <div class="card">
+    <form method="post" action="/validate">
+      <label for="topology">Topology</label>
+      <textarea id="topology" name="topology" required
+                placeholder="device internet internet external&#10;device fw1      firewall dmz&#10;device db1      database internal&#10;&#10;internet -- fw1&#10;fw1 -- db1">{{ topology_text or '' }}</textarea>
+      <button type="submit">Validate</button>
+    </form>
+  </div>
+
+  {% if error %}
+    <div class="error"><strong>Error:</strong> {{ error }}</div>
+  {% endif %}
+
+  {% if result %}
+    <div class="card">
+      <h2>Score</h2>
+      <div class="score-badge">
+        <span class="score-num">{{ result.score.score }}</span>
+        <span class="score-grade">Grade {{ result.score.grade }}</span>
+      </div>
+
+      {% if result.png_b64 %}
+        <h2>Topology</h2>
+        <img class="topology-img" alt="Topology"
+             src="data:image/png;base64,{{ result.png_b64 }}">
+      {% endif %}
+
+      <h2>Findings ({{ result.findings|length }})</h2>
+      {% if not result.findings %}
+        <p>[OK] No security design flaws detected.</p>
+      {% else %}
+        {% for f in result.findings %}
+          <div class="finding {{ f.severity }}">
+            <div class="sev">{{ f.severity }}</div>
+            <div class="msg">{{ f.message }}</div>
+            <div class="devices">Affected: {{ f.devices|join(', ') }}</div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="footer">
+    <a href="/docs">API docs</a> &middot;
+    <a href="https://github.com/ayus1n9/Network-Topology-Validator">Source on GitHub</a>
+  </div>
+</div>
+</body>
+</html>
