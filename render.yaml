@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: toposec
+    runtime: python
+    plan: free
+    branch: master
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -e ".[web]"
+    startCommand: uvicorn web.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: MPLBACKEND
+        value: Agg
